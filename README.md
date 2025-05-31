@@ -4,7 +4,7 @@
 **Tags:** wordpress, maintenance  
 **Requires at least:** 6.8  
 **Tested up to:** 6.8.1  
-**Stable tag:** 1.5.0  
+**Stable tag:** 1.5.1  
 **License:** GPLv3 or later  
 **License URI:** [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)  
 
@@ -94,6 +94,11 @@ The current version allows customisation of the image only. However, you can mod
 ---
 
 ## Changelog
+
+### 1.5.1
+
+- **Fixed:**
+  -Resolved an issue where the maintenance page content would not display, showing a blank 503 error instead. The core HTML output method has been reverted to a highly compatible and proven approach, ensuring the maintenance page displays correctly.
 
 ### 1.5.0 – Major Feature Update
 
