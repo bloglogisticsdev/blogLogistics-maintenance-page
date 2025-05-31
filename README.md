@@ -4,7 +4,7 @@
 **Tags:** wordpress, maintenance  
 **Requires at least:** 6.8  
 **Tested up to:** 6.8.1  
-**Stable tag:** 1.4.0-Beta  
+**Stable tag:** 1.5.0  
 **License:** GPLv3 or later  
 **License URI:** [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)  
 
@@ -94,6 +94,48 @@ The current version allows customisation of the image only. However, you can mod
 ---
 
 ## Changelog
+
+### 1.5.0 – Major Feature Update
+
+#### 🚀 Key Improvements
+
+- **Enable/Disable Maintenance Mode Toggle**
+  - Added a settings page with a checkbox to easily toggle maintenance mode.
+  - Utilizes the WordPress Settings API for secure, standards-based option handling.
+  - Settings persist in the database across sessions and updates.
+
+- **Custom Maintenance Image Upload**
+  - Seamless Media Library integration using `wp_enqueue_media()` and a custom admin script.
+  - Users can upload or select a custom image and see a live preview.
+  - Fallback to a default bundled image if no custom image is set.
+
+- **Improved Caching Compatibility**
+  - Defines `DONOTCACHEPAGE` to prevent caching of the maintenance page (WP Rocket compatible).
+  - Sends appropriate no-cache HTTP headers via `nocache_headers()`.
+  - Returns a `503 Service Unavailable` status to ensure search engines don’t penalize your site and caches don’t store the page.
+
+- **Administrator Notice**
+  - Displays a visible dashboard warning when maintenance mode is active—only shown to administrators.
+
+- **Object-Oriented Refactor**
+  - Introduced `BlogLogistics_Maintenance_Mode` class to encapsulate all functionality.
+  - Improves modularity, avoids naming conflicts, and makes the code easier to maintain.
+
+- **Responsive & Modern Maintenance Page**
+  - HTML5 structure with mobile-first CSS.
+  - Uses `clamp()` and `vh` units for responsive typography and image scaling.
+  - Enhanced visuals: clean layout, soft shadows, rounded corners, and semantic footer.
+
+- **Output Buffering**
+  - Uses `ob_start()` and `ob_end_clean()` to ensure that only the intended maintenance content and headers are sent—no theme or plugin interference.
+
+- **Internationalisation (i18n)**
+  - All user-facing strings are wrapped in translation functions with the proper text domain (`bloglogistics-maintenance-page`).
+
+- **Security Enhancements**
+  - `ABSPATH` check to prevent direct access.
+  - Strict use of escaping functions (`esc_html()`, `esc_url()`, `esc_attr()`, etc.) throughout.
+  - Role-based logic using `current_user_can( 'administrator' )`.
 
 ### 1.4.0-Beta
 
