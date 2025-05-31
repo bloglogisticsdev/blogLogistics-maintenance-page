@@ -98,7 +98,7 @@ The current version allows customisation of the image only. However, you can mod
 ### 1.5.1
 
 - **Fixed:**
-  -Resolved an issue where the maintenance page content would not display, showing a blank 503 error instead. The core HTML output method has been reverted to a highly compatible and proven approach, ensuring the maintenance page displays correctly.
+  Resolved an issue where the maintenance page content would not display, showing a blank 503 error instead. The core HTML output method has been reverted to a highly compatible and proven approach, ensuring the maintenance page displays correctly.
 
 ### 1.5.0 – Major Feature Update
 
