@@ -14,7 +14,7 @@ Displays a static maintenance page to non-logged-in admins on a WordPress websit
 
 ## Description
 
-This plugin displays a static maintenance page on the front-end when activated, redirecting all requests to the maintenance page. This plugin shows a maintenance page to everyone except administrators who are logged in (logged-in administrators will see the regular site). All other users will see the maintenance page. No configuration required.
+This plugin displays a static maintenance page on the front-end when activated, redirecting all requests to the maintenance page. This plugin shows a maintenance page to everyone except administrators who are logged in (logged-in administrators will see the regular site). All other users will see the maintenance page.
 
 The plugin also allows post-level exclusions and site-wide customisation of what content is included and how it’s structured.
 
