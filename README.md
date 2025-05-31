@@ -17,16 +17,29 @@ The plugin also allows post-level exclusions and site-wide customisation of what
 
 **Key Features:**
 
-- Creates `llms.txt` and `ai.txt` files in the WordPress root and uploads directory.
-- Uses Markdown formatting for both summary and detailed content sections.
-- Adds a meta box to posts and pages for excluding specific content from generated files.
-- Offers configurable options:
-  - Post types to include (with ordering support)
-  - Max posts per type
-  - Max words per post
-  - Whether to include excerpts, meta data (date, author), and taxonomies
-- Supports scheduled updates (Immediate, Daily, Weekly)
-- Admin interface for manually clearing caches and regenerating files
+* Simple Maintenance Mode Toggle
+Easily enable or disable maintenance mode from the WordPress admin settings—no coding required.
+
+* Custom Maintenance Image Support
+Upload and display your own branded maintenance image, or fall back to the included default image.
+
+* Administrator Bypass
+Logged-in administrators can continue viewing and editing the site while visitors see the maintenance page.
+
+* Caching Plugin Compatibility
+Fully compatible with popular caching plugins like WP Rocket—sends proper 503 headers and disables caching for the maintenance view.
+
+* SEO-Friendly Response
+Sends a 503 Service Unavailable status code to ensure search engines know the site is temporarily offline and not penalized.
+
+* Clean, Responsive Design
+Built-in maintenance page layout is mobile-friendly, visually clean, and uses modern styling.
+
+* No Coding Necessary
+Activate the plugin and configure it via the admin interface—perfect for non-technical users.
+
+* Lightweight and Secure
+Minimal footprint and secure implementation, following WordPress best practices.
 
 == Installation ==
 
