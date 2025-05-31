@@ -51,7 +51,7 @@ The plugin also allows post-level exclusions and site-wide customisation of what
 1. Upload the plugin files to the `/wp-content/plugins/blogLogistics-maintenance-page` directory, or install via the WordPress Plugins screen directly.  
 2. Activate the plugin through the 'Plugins' screen in WordPress.  
 3. Activate plugin.  
-4. No settings available.
+4. In WP settings, toggle maintenance mode on/of and upload custom image if needed.
 
 ---
 
