@@ -1,31 +1,348 @@
 <?php
 /**
-* Plugin Name: BlogLogistics Maintenance Page
-* Description: This plugin displays a static maintenance page on the front-end when activated, redirecting all requests to the maintenance page. This plugin shows a maintenance page to everyone except administrators who are logged in (logged in administrators will see the regular site). All other users will see the maintenance page. No configuration required.required.
-* Version: 1.4.0-Beta
-* Author: Roger Wheatley
-* Plugin URI: https://www.bloglogistics.com
-* License: GPLv3
-*/
+ * Plugin Name: BlogLogistics Maintenance Page
+ * Plugin URI: https://www.bloglogistics.com
+ * Description: Displays a customizable maintenance page to non-administrators, with options for a custom image and seamless integration with caching plugins like WP Rocket.
+ * Version: 1.5.0
+ * Author: Roger Wheatley
+ * License: GPLv3
+ */
 
-// Hook the 'template_redirect' action to display the maintenance page
-add_action('template_redirect', 'bloglogistics_maintenance_mode');
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
-function bloglogistics_maintenance_mode() {
-    // Allow administrators to see the site
-    if (current_user_can('administrator')) {
-        return;
+/**
+ * Class BlogLogistics_Maintenance_Mode
+ *
+ * Manages the website's maintenance mode functionality.
+ */
+class BlogLogistics_Maintenance_Mode {
+
+    /**
+     * Option key for enabling/disabling maintenance mode.
+     */
+    const OPTION_ENABLE_MAINTENANCE = 'bloglogistics_maintenance_mode_enabled';
+
+    /**
+     * Option key for the custom maintenance image URL.
+     */
+    const OPTION_CUSTOM_IMAGE_URL = 'bloglogistics_maintenance_custom_image_url';
+
+    /**
+     * Default maintenance image filename.
+     */
+    const DEFAULT_IMAGE_FILENAME = 'website-maintenance-min.jpg';
+
+    /**
+     * Constructor.
+     *
+     * Initializes the plugin by setting up hooks.
+     */
+    public function __construct() {
+        // Admin settings and UI
+        add_action( 'admin_init', array( $this, 'register_settings' ) );
+        add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+
+        // Frontend functionality
+        if ( $this->is_maintenance_mode_active() ) {
+            add_action( 'template_redirect', array( $this, 'display_maintenance_page' ) );
+            add_action( 'admin_notices', array( $this, 'maintenance_mode_active_notice' ) );
+        }
     }
 
-     /* ---  Tell WP Rocket (and every proxy / browser) not to cache THIS request --- */
-    define( 'DONOTCACHEPAGE', true );        // current request only, site-wide caching stays on
-    nocache_headers();                       // Adds proper HTTP headers
-    status_header( 503 );                    // 503 = service unavailable (WP Rocket never caches 503s)
+    /**
+     * Checks if maintenance mode is currently active.
+     *
+     * @return bool True if maintenance mode is active, false otherwise.
+     */
+    private function is_maintenance_mode_active() {
+        return (bool) get_option( self::OPTION_ENABLE_MAINTENANCE, false ); // Default to false (off)
+    }
 
-    $image_url = plugins_url( 'website-maintenance-min.jpg', __FILE__ );
+    /**
+     * Registers plugin settings with WordPress.
+     */
+    public function register_settings() {
+        // Register the maintenance mode toggle setting
+        register_setting(
+            'bloglogistics_maintenance_options', // Option group
+            self::OPTION_ENABLE_MAINTENANCE,     // Option name
+            array(
+                'type'              => 'boolean',
+                'sanitize_callback' => 'rest_sanitize_boolean',
+                'default'           => false,
+                'show_in_rest'      => false,
+            )
+        );
 
-    // Output the maintenance page
-    echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" text="text/html; charset=utf-8" /><meta http-equiv="CACHE-CONTROL" content="NO-CACHE" /><meta http-equiv="PRAGMA" content="NO-CACHE" /><meta http-equiv="EXPIRES" content="0" /><title>Website Under Maintenance</title><style> html,body{height:100%;margin:0;padding:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-sizing:border-box}h1{margin:0;padding:20px;font-size:2em}img{max-width:90%;max-height:90%;width:auto;height:auto;box-shadow:0 10px 10px -5px rgba(0,0,0,0.5);border:10px solid white;outline:1px solid rgba(0,0,0,0.1)}@media (max-width:600px){img{max-width:80%}}</style></head><body><h1>WEBSITE UNDER MAINTENANCE</h1><img class="skip-lazy" src="' . esc_url( $image_url ) . '" alt="This website is under maintenance, we\'ll be back soon" title="This website is under maintenance, we\'ll be back soon"/></body></html>';
-    exit();
+        // Register the custom image URL setting
+        register_setting(
+            'bloglogistics_maintenance_options', // Option group
+            self::OPTION_CUSTOM_IMAGE_URL,       // Option name
+            array(
+                'type'              => 'string',
+                'sanitize_callback' => array( $this, 'sanitize_image_url' ),
+                'default'           => '',
+                'show_in_rest'      => false,
+            )
+        );
+
+        // Add a settings section
+        add_settings_section(
+            'bloglogistics_maintenance_section', // ID
+            esc_html__( 'Maintenance Mode Settings', 'bloglogistics-maintenance-page' ), // Title
+            null, // Callback (no intro text needed)
+            'bloglogistics_maintenance_page_slug' // Page
+        );
+
+        // Add the enable/disable field
+        add_settings_field(
+            'bloglogistics_maintenance_enable_field', // ID
+            esc_html__( 'Enable Maintenance Mode', 'bloglogistics-maintenance-page' ), // Title
+            array( $this, 'render_enable_maintenance_field' ), // Callback
+            'bloglogistics_maintenance_page_slug', // Page
+            'bloglogistics_maintenance_section' // Section
+        );
+
+        // Add the custom image upload field
+        add_settings_field(
+            'bloglogistics_maintenance_image_field', // ID
+            esc_html__( 'Custom Maintenance Image', 'bloglogistics-maintenance-page' ), // Title
+            array( $this, 'render_custom_image_field' ), // Callback
+            'bloglogistics_maintenance_page_slug', // Page
+            'bloglogistics_maintenance_section' // Section
+        );
+    }
+
+    /**
+     * Sanitizes the custom image URL.
+     *
+     * @param string $url The URL to sanitize.
+     * @return string The sanitized URL.
+     */
+    public function sanitize_image_url( $url ) {
+        return esc_url_raw( $url );
+    }
+
+    /**
+     * Renders the checkbox field for enabling/disabling maintenance mode.
+     */
+    public function render_enable_maintenance_field() {
+        $enabled = $this->is_maintenance_mode_active();
+        ?>
+        <label for="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>">
+            <input type="checkbox" id="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" name="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" value="1" <?php checked( $enabled, true ); ?> />
+            <?php esc_html_e( 'Check this box to put your website into maintenance mode.', 'bloglogistics-maintenance-page' ); ?>
+        </label>
+        <?php
+    }
+
+    /**
+     * Renders the custom image upload field.
+     */
+    public function render_custom_image_field() {
+        $image_url = get_option( self::OPTION_CUSTOM_IMAGE_URL, '' );
+        ?>
+        <div class="bloglogistics-image-uploader">
+            <input type="text" id="<?php echo esc_attr( self::OPTION_CUSTOM_IMAGE_URL ); ?>" name="<?php echo esc_attr( self::OPTION_CUSTOM_IMAGE_URL ); ?>" value="<?php echo esc_attr( $image_url ); ?>" class="regular-text" readonly />
+            <button type="button" class="button button-secondary bloglogistics-upload-button">
+                <?php esc_html_e( 'Upload/Select Image', 'bloglogistics-maintenance-page' ); ?>
+            </button>
+            <button type="button" class="button button-secondary bloglogistics-remove-button" style="<?php echo empty( $image_url ) ? 'display:none;' : ''; ?>">
+                <?php esc_html_e( 'Remove Image', 'bloglogistics-maintenance-page' ); ?>
+            </button>
+            <p class="description">
+                <?php esc_html_e( 'Upload a custom image for your maintenance page. If no image is set, the default image will be used.', 'bloglogistics-maintenance-page' ); ?>
+            </p>
+            <div class="bloglogistics-image-preview" style="margin-top: 10px;">
+                <?php if ( ! empty( $image_url ) ) : ?>
+                    <img src="<?php echo esc_url( $image_url ); ?>" style="max-width: 200px; height: auto;" />
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Adds the plugin's settings page to the WordPress admin menu.
+     */
+    public function add_admin_menu() {
+        add_options_page(
+            esc_html__( 'Maintenance Mode Settings', 'bloglogistics-maintenance-page' ), // Page title
+            esc_html__( 'Maintenance Mode', 'bloglogistics-maintenance-page' ),         // Menu title
+            'manage_options',                                                         // Capability required
+            'bloglogistics_maintenance_page_slug',                                    // Menu slug
+            array( $this, 'render_settings_page' )                                    // Callback to render content
+        );
+    }
+
+    /**
+     * Enqueues necessary admin scripts (Media Uploader).
+     *
+     * @param string $hook The current admin page hook.
+     */
+    public function enqueue_admin_scripts( $hook ) {
+        if ( 'settings_page_bloglogistics_maintenance_page_slug' !== $hook ) {
+            return;
+        }
+
+        wp_enqueue_media(); // Enqueue WordPress media uploader scripts and styles
+
+        wp_enqueue_script(
+            'bloglogistics-maintenance-admin-script',
+            plugins_url( 'assets/admin-script.js', __FILE__ ), // Path to our custom admin JS
+            array( 'jquery' ),
+            '1.0.0',
+            true
+        );
+    }
+
+    /**
+     * Renders the content of the plugin's settings page.
+     */
+    public function render_settings_page() {
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'BlogLogistics Maintenance Mode', 'bloglogistics-maintenance-page' ); ?></h1>
+            <form method="post" action="options.php">
+                <?php
+                settings_fields( 'bloglogistics_maintenance_options' ); // Output security fields
+                do_settings_sections( 'bloglogistics_maintenance_page_slug' ); // Output setting sections
+                submit_button();
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Displays an admin notice if maintenance mode is active.
+     */
+    public function maintenance_mode_active_notice() {
+        if ( current_user_can( 'administrator' ) ) {
+            ?>
+            <div class="notice notice-warning is-dismissible">
+                <p>
+                    <strong><?php esc_html_e( 'Maintenance Mode is ACTIVE!', 'bloglogistics-maintenance-page' ); ?></strong><br />
+                    <?php esc_html_e( 'Your website is currently displaying the maintenance page to all non-administrators. ', 'bloglogistics-maintenance-page' ); ?>
+                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=bloglogistics_maintenance_page_slug' ) ); ?>">
+                        <?php esc_html_e( 'Go to settings to disable it.', 'bloglogistics-maintenance-page' ); ?>
+                    </a>
+                </p>
+            </div>
+            <?php
+        }
+    }
+
+    /**
+     * Displays the maintenance page to non-administrators.
+     */
+    public function display_maintenance_page() {
+        // Allow administrators to see the site normally.
+        if ( current_user_can( 'administrator' ) ) {
+            return;
+        }
+
+        // --- Tell caching solutions (like WP Rocket) and browsers not to cache THIS request ---
+        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+            define( 'DONOTCACHEPAGE', true ); // Current request only, site-wide caching stays on
+        }
+        nocache_headers(); // Adds proper HTTP headers (Cache-Control, Pragma, Expires)
+        status_header( 503 ); // 503 = service unavailable (WP Rocket and most proxies never cache 503s)
+
+        // Determine which image to use
+        $custom_image_url = get_option( self::OPTION_CUSTOM_IMAGE_URL );
+        $image_url        = ! empty( $custom_image_url ) ? $custom_image_url : plugins_url( 'assets/' . self::DEFAULT_IMAGE_FILENAME, __FILE__ );
+
+        // Begin output buffering to catch any stray output before our maintenance page.
+        // This helps ensure the 503 header is sent correctly.
+        ob_start();
+        ?>
+        <!DOCTYPE html>
+        <html <?php language_attributes(); ?>>
+        <head>
+            <meta charset="<?php bloginfo( 'charset' ); ?>" />
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
+            <meta http-equiv="PRAGMA" content="NO-CACHE" />
+            <meta http-equiv="EXPIRES" content="0" />
+            <title><?php esc_html_e( 'Website Under Maintenance', 'bloglogistics-maintenance-page' ); ?></title>
+            <style>
+                html, body {
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    box-sizing: border-box;
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+                    background-color: #f0f0f0; /* Light grey background */
+                    color: #333;
+                }
+                h1 {
+                    margin: 0;
+                    padding: 20px;
+                    font-size: clamp(1.5em, 5vw, 3em); /* Responsive font size */
+                    color: #222;
+                    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                }
+                img {
+                    max-width: 90%;
+                    max-height: 70vh; /* Use viewport height for better responsiveness */
+                    width: auto;
+                    height: auto;
+                    box-shadow: 0 10px 10px -5px rgba(0,0,0,0.2); /* Softer shadow */
+                    border: 10px solid #ffffff;
+                    outline: 1px solid rgba(0,0,0,0.05);
+                    border-radius: 8px; /* Slightly rounded corners */
+                }
+                p {
+                    font-size: clamp(1em, 2vw, 1.2em);
+                    padding: 0 20px;
+                    max-width: 800px;
+                    line-height: 1.6;
+                }
+                footer {
+                    margin-top: 20px;
+                    font-size: 0.8em;
+                    color: #666;
+                }
+                @media (max-width: 768px) {
+                    h1 {
+                        padding: 15px;
+                    }
+                    img {
+                        max-width: 95%;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <h1><?php esc_html_e( 'WEBSITE UNDER MAINTENANCE', 'bloglogistics-maintenance-page' ); ?></h1>
+            <img class="skip-lazy" src="<?php echo esc_url( $image_url ); ?>" alt="<?php esc_attr_e( 'This website is currently under maintenance. We will be back soon!', 'bloglogistics-maintenance-page' ); ?>" title="<?php esc_attr_e( 'This website is currently under maintenance. We will be back soon!', 'bloglogistics-maintenance-page' ); ?>"/>
+            <p><?php esc_html_e( 'We apologize for the inconvenience. Our website is currently undergoing scheduled maintenance and will be back online shortly. Thank you for your patience!', 'bloglogistics-maintenance-page' ); ?></p>
+            <footer><?php printf( esc_html__( '&copy; %s All Rights Reserved.', 'bloglogistics-maintenance-page' ), date_i18n( 'Y' ) ); ?></footer>
+        </body>
+        </html>
+        <?php
+        // Clear any previous output and send our maintenance page.
+        ob_end_clean();
+        exit(); // Crucial to stop WordPress execution and display only this page.
+    }
 }
-?>
+
+// Instantiate the plugin class.
+new BlogLogistics_Maintenance_Mode();
+
+// To include the default image and admin script, create the following folder structure:
+// /wp-content/plugins/bloglogistics-maintenance-page/
+// ├── bloglogistics-maintenance-page.php (this file)
+// └── assets/
+//     ├── website-maintenance-min.jpg (your default image)
+//     └── admin-script.js (JS for media uploader)
