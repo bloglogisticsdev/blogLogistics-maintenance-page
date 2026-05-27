@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.3
+ * Version:           1.5.4
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.3' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.4' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
@@ -75,7 +75,8 @@ class BlogLogistics_Maintenance_Mode {
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
         add_action( 'admin_notices', array( $this, 'maintenance_mode_active_notice' ) );
 
-        // Frontend functionality. Always register the hook, then check the saved option inside the callback.
+        // Frontend functionality. Intercept public requests as early as practical, then keep a later fallback.
+        add_action( 'init', array( $this, 'display_maintenance_page' ), 0 );
         add_action( 'template_redirect', array( $this, 'display_maintenance_page' ), 0 );
 
         // Purge common caches when the mode changes so logged-out visitors do not keep seeing cached public pages.
@@ -336,31 +337,98 @@ class BlogLogistics_Maintenance_Mode {
     }
 
     /**
-     * Displays the maintenance page to non-administrators using the old working method.
+     * Determines whether the current request should bypass maintenance mode.
+     *
+     * @return bool True when the current request should not show maintenance mode.
+     */
+    private function should_bypass_maintenance_page() {
+        if ( defined( 'WP_CLI' ) && WP_CLI ) {
+            return true;
+        }
+
+        if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+            return true;
+        }
+
+        if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
+            return true;
+        }
+
+        if ( is_admin() ) {
+            return true;
+        }
+
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+
+        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+        $script_name = isset( $_SERVER['SCRIPT_NAME'] ) ? wp_unslash( $_SERVER['SCRIPT_NAME'] ) : '';
+
+        $allowed_paths = array(
+            'wp-login.php',
+            'wp-cron.php',
+            'xmlrpc.php',
+            'wp-json',
+        );
+
+        foreach ( $allowed_paths as $allowed_path ) {
+            if ( false !== strpos( $request_uri, $allowed_path ) || false !== strpos( $script_name, $allowed_path ) ) {
+                return true;
+            }
+        }
+
+        if ( isset( $_GET['rest_route'] ) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sends headers that make cached public pages much less likely to leak through.
+     */
+    private function send_maintenance_headers() {
+        $this->set_cache_bypass_constants();
+
+        if ( ! headers_sent() ) {
+            nocache_headers();
+            status_header( 503 );
+            header( 'Retry-After: 3600' );
+            header( 'X-BlogLogistics-Maintenance-Mode: active' );
+            header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0, private' );
+            header( 'Pragma: no-cache' );
+            header( 'Expires: Wed, 11 Jan 1984 05:00:00 GMT' );
+        }
+    }
+
+    /**
+     * Displays the maintenance page to logged-out visitors and non-managers.
      */
     public function display_maintenance_page() {
+        static $already_displayed = false;
+
+        if ( $already_displayed ) {
+            return;
+        }
+
         if ( ! $this->is_maintenance_mode_active() ) {
             return;
         }
 
-        // Allow site managers to see the site normally.
-        if ( current_user_can( 'manage_options' ) ) {
+        if ( $this->should_bypass_maintenance_page() ) {
             return;
         }
 
-        $this->set_cache_bypass_constants();
-        nocache_headers();
-        status_header( 503 );
-        header( 'Retry-After: 3600' );
+        $already_displayed = true;
 
-        // Determine which image to use (uses custom if set, otherwise default in plugin root)
+        $this->send_maintenance_headers();
+
         $custom_image_url = get_option( self::OPTION_CUSTOM_IMAGE_URL );
-        // Use custom image if available, otherwise use the default image from the plugin's root folder.
         $image_url        = ! empty( $custom_image_url ) ? $custom_image_url : plugins_url( self::DEFAULT_IMAGE_FILENAME, __FILE__ );
 
-        // Output the maintenance page using the old working method (single echo, no output buffering)
-        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" text="text/html; charset=utf-8" /><meta http-equiv="CACHE-CONTROL" content="NO-CACHE" /><meta http-equiv="PRAGMA" content="NO-CACHE" /><meta http-equiv="EXPIRES" content="0" /><title>' . esc_html__( 'Website Under Maintenance', 'bloglogistics-maintenance-page' ) . '</title><style> html,body{height:100%;margin:0;padding:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-sizing:border-box}h1{margin:0;padding:20px;font-size:2em}img{max-width:90%;max-height:90%;width:auto;height:auto;box-shadow:0 10px 10px -5px rgba(0,0,0,0.5);border:10px solid white;outline:1px solid rgba(0,0,0,0.1)}@media (max-width:600px){img{max-width:80%}}</style></head><body><h1>' . esc_html__( 'WEBSITE UNDER MAINTENANCE', 'bloglogistics-maintenance-page' ) . '</h1><img class="skip-lazy" src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '" title="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '"/></body></html>';
-        exit(); // Crucial to stop WordPress execution and display only this page.
+        echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>' . esc_html__( 'Website Under Maintenance', 'bloglogistics-maintenance-page' ) . '</title><style>html,body{min-height:100%;margin:0;padding:0}body{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-sizing:border-box;font-family:Arial,sans-serif;background:#f7f7f7;color:#111}h1{margin:0;padding:20px;font-size:clamp(1.75rem,4vw,3rem);letter-spacing:.04em}img{max-width:min(90%,900px);max-height:75vh;width:auto;height:auto;box-shadow:0 10px 10px -5px rgba(0,0,0,.5);border:10px solid #fff;outline:1px solid rgba(0,0,0,.1);background:#fff}</style></head><body><h1>' . esc_html__( 'WEBSITE UNDER MAINTENANCE', 'bloglogistics-maintenance-page' ) . '</h1><img class="skip-lazy" src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '" title="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '"></body></html>';
+        exit;
     }
 }
 

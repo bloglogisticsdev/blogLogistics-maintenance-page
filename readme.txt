@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.3
+Stable tag: 1.5.4
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,11 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
+
+= 1.5.4 =
+* Intercept public requests on init as well as template_redirect so logged-out visitors see maintenance mode before themes, redirects, or most plugins can output cached pages.
+* Added a diagnostic X-BlogLogistics-Maintenance-Mode header to confirm whether WordPress is executing for logged-out requests.
+* Hardened bypass rules for admin, login, AJAX, REST, cron, XML-RPC, and WP-CLI requests.
 
 = 1.5.3 =
 * Fix: Ensure maintenance mode reliably applies to logged-out visitors by registering the front-end redirect hook on every request and checking the saved setting inside the callback.
