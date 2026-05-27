@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,11 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
+
+= 1.5.3 =
+* Fix: Ensure maintenance mode reliably applies to logged-out visitors by registering the front-end redirect hook on every request and checking the saved setting inside the callback.
+* Fix: Purge common WordPress cache plugins when maintenance mode is toggled so cached public pages do not continue showing to visitors.
+* Fix: Save an explicit disabled value when the checkbox is unchecked.
 
 = 1.5.2 =
 * Standardize plugin for GitHub release-based updates.

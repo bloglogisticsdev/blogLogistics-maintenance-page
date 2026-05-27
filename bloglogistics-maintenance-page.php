@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.2
+ * Version:           1.5.3
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.2' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.3' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
@@ -69,15 +69,20 @@ class BlogLogistics_Maintenance_Mode {
      * Initializes the plugin by setting up hooks.
      */
     public function __construct() {
-        // Admin settings and UI
+        // Admin settings and UI.
         add_action( 'admin_init', array( $this, 'register_settings' ) );
         add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+        add_action( 'admin_notices', array( $this, 'maintenance_mode_active_notice' ) );
 
-        // Frontend functionality
+        // Frontend functionality. Always register the hook, then check the saved option inside the callback.
+        add_action( 'template_redirect', array( $this, 'display_maintenance_page' ), 0 );
+
+        // Purge common caches when the mode changes so logged-out visitors do not keep seeing cached public pages.
+        add_action( 'update_option_' . self::OPTION_ENABLE_MAINTENANCE, array( $this, 'handle_maintenance_mode_update' ), 10, 3 );
+
         if ( $this->is_maintenance_mode_active() ) {
-            add_action( 'template_redirect', array( $this, 'display_maintenance_page' ) );
-            add_action( 'admin_notices', array( $this, 'maintenance_mode_active_notice' ) );
+            $this->set_cache_bypass_constants();
         }
     }
 
@@ -87,8 +92,71 @@ class BlogLogistics_Maintenance_Mode {
      * @return bool True if maintenance mode is active, false otherwise.
      */
     private function is_maintenance_mode_active() {
-        // Default to false (off) unless explicitly enabled
-        return (bool) get_option( self::OPTION_ENABLE_MAINTENANCE, false );
+        // Default to false unless explicitly enabled.
+        return rest_sanitize_boolean( get_option( self::OPTION_ENABLE_MAINTENANCE, false ) );
+    }
+
+    /**
+     * Defines cache bypass constants for cache plugins that load after normal plugins.
+     */
+    private function set_cache_bypass_constants() {
+        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+            define( 'DONOTCACHEPAGE', true );
+        }
+
+        if ( ! defined( 'DONOTCACHEOBJECT' ) ) {
+            define( 'DONOTCACHEOBJECT', true );
+        }
+
+        if ( ! defined( 'DONOTCACHEDB' ) ) {
+            define( 'DONOTCACHEDB', true );
+        }
+    }
+
+    /**
+     * Purges common cache layers when maintenance mode is toggled.
+     *
+     * @param mixed  $old_value The previous option value.
+     * @param mixed  $value     The new option value.
+     * @param string $option    The option name.
+     */
+    public function handle_maintenance_mode_update( $old_value, $value, $option ) {
+        unset( $option );
+
+        if ( rest_sanitize_boolean( $old_value ) === rest_sanitize_boolean( $value ) ) {
+            return;
+        }
+
+        $this->purge_site_caches();
+    }
+
+    /**
+     * Clears popular WordPress cache plugins and the object cache where available.
+     */
+    private function purge_site_caches() {
+        if ( function_exists( 'rocket_clean_domain' ) ) {
+            rocket_clean_domain();
+        }
+
+        if ( function_exists( 'w3tc_flush_all' ) ) {
+            w3tc_flush_all();
+        }
+
+        if ( function_exists( 'wp_cache_clear_cache' ) ) {
+            wp_cache_clear_cache();
+        }
+
+        if ( class_exists( 'LiteSpeed_Cache_API' ) && method_exists( 'LiteSpeed_Cache_API', 'purge_all' ) ) {
+            LiteSpeed_Cache_API::purge_all();
+        }
+
+        if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
+            sg_cachepress_purge_cache();
+        }
+
+        if ( function_exists( 'wp_cache_flush' ) ) {
+            wp_cache_flush();
+        }
     }
 
     /**
@@ -163,6 +231,7 @@ class BlogLogistics_Maintenance_Mode {
         $enabled = $this->is_maintenance_mode_active();
         ?>
         <label for="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>">
+            <input type="hidden" name="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" value="0" />
             <input type="checkbox" id="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" name="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" value="1" <?php checked( $enabled, true ); ?> />
             <?php esc_html_e( 'Check this box to put your website into maintenance mode.', 'bloglogistics-maintenance-page' ); ?>
         </label>
@@ -251,7 +320,7 @@ class BlogLogistics_Maintenance_Mode {
      * Displays an admin notice if maintenance mode is active.
      */
     public function maintenance_mode_active_notice() {
-        if ( current_user_can( 'administrator' ) ) {
+        if ( $this->is_maintenance_mode_active() && current_user_can( 'manage_options' ) ) {
             ?>
             <div class="notice notice-warning is-dismissible">
                 <p>
@@ -270,17 +339,19 @@ class BlogLogistics_Maintenance_Mode {
      * Displays the maintenance page to non-administrators using the old working method.
      */
     public function display_maintenance_page() {
-        // Allow administrators to see the site normally.
-        if ( current_user_can( 'administrator' ) ) {
+        if ( ! $this->is_maintenance_mode_active() ) {
             return;
         }
 
-        // --- Tell caching solutions (like WP Rocket) and browsers not to cache THIS request ---
-        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
-            define( 'DONOTCACHEPAGE', true ); // Current request only, site-wide caching stays on
+        // Allow site managers to see the site normally.
+        if ( current_user_can( 'manage_options' ) ) {
+            return;
         }
-        nocache_headers(); // Adds proper HTTP headers (Cache-Control, Pragma, Expires)
-        status_header( 503 ); // 503 = service unavailable (WP Rocket and most proxies never cache 503s)
+
+        $this->set_cache_bypass_constants();
+        nocache_headers();
+        status_header( 503 );
+        header( 'Retry-After: 3600' );
 
         // Determine which image to use (uses custom if set, otherwise default in plugin root)
         $custom_image_url = get_option( self::OPTION_CUSTOM_IMAGE_URL );
