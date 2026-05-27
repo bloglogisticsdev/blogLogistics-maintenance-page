@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -75,7 +75,9 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
 
-= 1.5.5 =
+= 1.5.6 =
+* Fixed admin warning notice so it only appears when maintenance mode is actually enabled.
+* Added strict checkbox sanitization to prevent stale truthy values from keeping maintenance mode active.
 * Purges common WordPress, host, and page-cache plugins immediately whenever maintenance mode is toggled on or off.
 * Adds early maintenance checks on init and template_redirect so logged-out visitors are intercepted before the theme loads.
 * Adds cache-bypass constants and diagnostic maintenance response headers.
@@ -110,7 +112,7 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Upgrade Notice ==
 
-= 1.5.5 =
+= 1.5.6 =
 Maintenance mode now purges caches when toggled, helping prevent cached normal pages from showing after maintenance is re-enabled.
 
 = 1.5.2 =

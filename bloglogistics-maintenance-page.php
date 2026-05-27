@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.5
+ * Version:           1.5.6
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.5' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.6' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
@@ -91,8 +91,9 @@ class BlogLogistics_Maintenance_Mode {
      * @return bool True if maintenance mode is active, false otherwise.
      */
     private function is_maintenance_mode_active() {
-        // Default to false (off) unless explicitly enabled
-        return (bool) get_option( self::OPTION_ENABLE_MAINTENANCE, false );
+        $value = get_option( self::OPTION_ENABLE_MAINTENANCE, 0 );
+
+        return in_array( $value, array( true, 1, '1', 'true', 'on', 'yes' ), true );
     }
 
     /**
@@ -105,7 +106,7 @@ class BlogLogistics_Maintenance_Mode {
             self::OPTION_ENABLE_MAINTENANCE,     // Option name
             array(
                 'type'              => 'boolean',
-                'sanitize_callback' => 'rest_sanitize_boolean',
+                'sanitize_callback' => array( $this, 'sanitize_boolean_option' ),
                 'default'           => false,
                 'show_in_rest'      => false,
             )
@@ -158,6 +159,20 @@ class BlogLogistics_Maintenance_Mode {
      */
     public function sanitize_image_url( $url ) {
         return esc_url_raw( $url );
+    }
+
+    /**
+     * Sanitizes checkbox-style boolean settings into a predictable 1 or 0 value.
+     *
+     * @param mixed $value The submitted option value.
+     * @return int 1 when enabled, 0 when disabled.
+     */
+    public function sanitize_boolean_option( $value ) {
+        if ( is_array( $value ) ) {
+            $value = end( $value );
+        }
+
+        return in_array( $value, array( true, 1, '1', 'true', 'on', 'yes' ), true ) ? 1 : 0;
     }
 
     /**
@@ -256,8 +271,11 @@ class BlogLogistics_Maintenance_Mode {
      * Displays an admin notice if maintenance mode is active.
      */
     public function maintenance_mode_active_notice() {
-        if ( current_user_can( 'administrator' ) ) {
-            ?>
+        if ( ! $this->is_maintenance_mode_active() || ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+
+        ?>
             <div class="notice notice-warning is-dismissible">
                 <p>
                     <strong><?php esc_html_e( 'Maintenance Mode is ACTIVE!', 'bloglogistics-maintenance-page' ); ?></strong><br />
@@ -267,8 +285,7 @@ class BlogLogistics_Maintenance_Mode {
                     </a>
                 </p>
             </div>
-            <?php
-        }
+        <?php
     }
 
     /**
