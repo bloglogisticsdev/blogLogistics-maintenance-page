@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.4
+Stable tag: 1.5.5
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -75,15 +75,11 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
 
-= 1.5.4 =
-* Intercept public requests on init as well as template_redirect so logged-out visitors see maintenance mode before themes, redirects, or most plugins can output cached pages.
-* Added a diagnostic X-BlogLogistics-Maintenance-Mode header to confirm whether WordPress is executing for logged-out requests.
-* Hardened bypass rules for admin, login, AJAX, REST, cron, XML-RPC, and WP-CLI requests.
-
-= 1.5.3 =
-* Fix: Ensure maintenance mode reliably applies to logged-out visitors by registering the front-end redirect hook on every request and checking the saved setting inside the callback.
-* Fix: Purge common WordPress cache plugins when maintenance mode is toggled so cached public pages do not continue showing to visitors.
-* Fix: Save an explicit disabled value when the checkbox is unchecked.
+= 1.5.5 =
+* Purges common WordPress, host, and page-cache plugins immediately whenever maintenance mode is toggled on or off.
+* Adds early maintenance checks on init and template_redirect so logged-out visitors are intercepted before the theme loads.
+* Adds cache-bypass constants and diagnostic maintenance response headers.
+* Adds hidden checkbox fallback so disabling maintenance mode saves reliably.
 
 = 1.5.2 =
 * Standardize plugin for GitHub release-based updates.
@@ -113,6 +109,9 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 * Fixed issue where caching solutions could still display the normal content page.
 
 == Upgrade Notice ==
+
+= 1.5.5 =
+Maintenance mode now purges caches when toggled, helping prevent cached normal pages from showing after maintenance is re-enabled.
 
 = 1.5.2 =
 Standardizes the plugin for BlogLogistics GitHub release-based updates and updates requirements to WordPress 7.0 and PHP 8.3.
