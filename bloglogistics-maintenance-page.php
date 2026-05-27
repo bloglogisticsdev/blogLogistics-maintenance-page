@@ -1,16 +1,42 @@
 <?php
 /**
- * Plugin Name: BlogLogistics Maintenance Page
- * Plugin URI: https://www.bloglogistics.com
- * Description: Displays a customizable maintenance page to non-administrators, with options for a custom image and seamless integration with caching plugins like WP Rocket.
- * Version: 1.5.1
- * Author: Roger Wheatley
- * License: GPLv3
+ * Plugin Name:       BlogLogistics Maintenance Page
+ * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
+ * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
+ * Version:           1.5.2
+ * Requires at least: 7.0
+ * Requires PHP:      8.3
+ * Author:            BlogLogistics
+ * Author URI:        https://www.bloglogistics.com/
+ * License:           GPL-3.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
+ * Update URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
+ * Text Domain:       bloglogistics-maintenance-page
  */
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
+}
+
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.2' );
+define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
+define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
+define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
+define( 'BLOGLOGISTICS_MP_REPO_URL', 'https://github.com/bloglogisticsdev/blogLogistics-maintenance-page/' );
+
+$bloglogistics_mp_puc = BLOGLOGISTICS_MP_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
+
+if ( file_exists( $bloglogistics_mp_puc ) ) {
+    require_once $bloglogistics_mp_puc;
+
+    require_once BLOGLOGISTICS_MP_DIR . 'includes/class-bloglogistics-maintenance-page-github-updater.php';
+
+    BlogLogistics_Maintenance_Page_GitHub_Updater::init( [
+        'repo_url'    => BLOGLOGISTICS_MP_REPO_URL,
+        'plugin_file' => BLOGLOGISTICS_MP_FILE,
+        'slug'        => BLOGLOGISTICS_MP_SLUG,
+    ] );
 }
 
 /**
