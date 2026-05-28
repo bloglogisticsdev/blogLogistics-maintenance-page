@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.6
+ * Version:           1.5.7
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.6' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.7' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
@@ -28,7 +28,9 @@ define( 'BLOGLOGISTICS_MP_REPO_URL', 'https://github.com/bloglogisticsdev/blogLo
 $bloglogistics_mp_puc = BLOGLOGISTICS_MP_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 
 if ( file_exists( $bloglogistics_mp_puc ) ) {
-    require_once $bloglogistics_mp_puc;
+    if ( ! class_exists( \YahnisElsts\PluginUpdateChecker\v5\PucFactory::class, false ) ) {
+        require_once $bloglogistics_mp_puc;
+    }
 
     require_once BLOGLOGISTICS_MP_DIR . 'includes/class-bloglogistics-maintenance-page-github-updater.php';
 
