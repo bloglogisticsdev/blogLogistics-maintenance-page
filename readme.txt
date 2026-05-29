@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -75,6 +75,10 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
 
+= 1.5.8 =
+* Switch update checks to the BlogLogistics update manifest endpoint.
+* Avoid GitHub API update checks to reduce rate-limit errors.
+
 = 1.5.7 =
 * Prevent Plugin Update Checker from loading more than once when multiple BlogLogistics plugins are active.
 * Keep the Maintenance Page updater wrapper class plugin-specific to avoid conflicts with other BlogLogistics plugins.
@@ -115,6 +119,9 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 * Fixed issue where caching solutions could still display the normal content page.
 
 == Upgrade Notice ==
+
+= 1.5.8 =
+Maintenance Page now checks BlogLogistics update manifests instead of the GitHub API for update metadata.
 
 = 1.5.6 =
 Maintenance mode now purges caches when toggled, helping prevent cached normal pages from showing after maintenance is re-enabled.
