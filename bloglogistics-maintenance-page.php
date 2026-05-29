@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.8
+ * Version:           1.5.9
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.8' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.9' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
