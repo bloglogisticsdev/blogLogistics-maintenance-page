@@ -3,7 +3,7 @@
  * Plugin Name:       BlogLogistics Maintenance Page
  * Plugin URI:        https://github.com/bloglogisticsdev/blogLogistics-maintenance-page
  * Description:       Displays a custom maintenance page for visitors while allowing administrators to access the site.
- * Version:           1.5.9
+ * Version:           1.5.10
  * Requires at least: 7.0
  * Requires PHP:      8.3
  * Author:            BlogLogistics
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'BLOGLOGISTICS_MP_VERSION', '1.5.9' );
+define( 'BLOGLOGISTICS_MP_VERSION', '1.5.10' );
 define( 'BLOGLOGISTICS_MP_SLUG', 'blogLogistics-maintenance-page' );
 define( 'BLOGLOGISTICS_MP_FILE', __FILE__ );
 define( 'BLOGLOGISTICS_MP_DIR', plugin_dir_path( __FILE__ ) );
@@ -65,6 +65,13 @@ class BlogLogistics_Maintenance_Mode {
      * /wp-content/plugins/bloglogistics-maintenance-page/website-maintenance-min.jpg
      */
     const DEFAULT_IMAGE_FILENAME = 'website-maintenance-min.jpg';
+
+    /**
+     * Admin page hook suffix for this plugin's settings page.
+     *
+     * @var string
+     */
+    private $settings_page_hook = '';
 
     /**
      * Constructor.
@@ -219,16 +226,74 @@ class BlogLogistics_Maintenance_Mode {
     }
 
     /**
-     * Adds the plugin's settings page to the WordPress admin menu.
+     * Adds the shared BlogLogistics admin menu and this plugin's settings page.
      */
     public function add_admin_menu() {
-        add_options_page(
-            esc_html__( 'Maintenance Mode Settings', 'bloglogistics-maintenance-page' ), // Page title
-            esc_html__( 'Maintenance Mode', 'bloglogistics-maintenance-page' ),         // Menu title
-            'manage_options',                                                         // Capability required
-            'bloglogistics_maintenance_page_slug',                                    // Menu slug
-            array( $this, 'render_settings_page' )                                    // Callback to render content
+        $this->register_bloglogistics_parent_menu();
+
+        $this->settings_page_hook = add_submenu_page(
+            'bloglogistics',
+            esc_html__( 'Maintenance Mode Settings', 'bloglogistics-maintenance-page' ),
+            esc_html__( 'Maintenance Page', 'bloglogistics-maintenance-page' ),
+            'manage_options',
+            'bloglogistics_maintenance_page_slug',
+            array( $this, 'render_settings_page' )
         );
+    }
+
+    /**
+     * Register the shared BlogLogistics parent menu if another BlogLogistics plugin has not already done so.
+     */
+    private function register_bloglogistics_parent_menu() {
+        if ( $this->bloglogistics_parent_menu_exists() ) {
+            return;
+        }
+
+        add_menu_page(
+            esc_html__( 'BlogLogistics', 'bloglogistics-maintenance-page' ),
+            esc_html__( 'BlogLogistics', 'bloglogistics-maintenance-page' ),
+            'manage_options',
+            'bloglogistics',
+            array( $this, 'render_bloglogistics_parent_page' ),
+            'dashicons-rss',
+            58
+        );
+    }
+
+    /**
+     * Check whether the shared BlogLogistics parent menu already exists.
+     *
+     * @return bool True when the parent menu is already registered.
+     */
+    private function bloglogistics_parent_menu_exists() {
+        global $menu;
+
+        if ( ! is_array( $menu ) ) {
+            return false;
+        }
+
+        foreach ( $menu as $menu_item ) {
+            if ( isset( $menu_item[2] ) && 'bloglogistics' === $menu_item[2] ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Render the shared BlogLogistics parent menu page.
+     */
+    public function render_bloglogistics_parent_page() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
+        ?>
+        <div class="wrap">
+            <h1><?php esc_html_e( 'BlogLogistics', 'bloglogistics-maintenance-page' ); ?></h1>
+            <p><?php esc_html_e( 'Use the BlogLogistics submenu items to manage installed BlogLogistics plugins.', 'bloglogistics-maintenance-page' ); ?></p>
+        </div>
+        <?php
     }
 
     /**
@@ -237,7 +302,7 @@ class BlogLogistics_Maintenance_Mode {
      * @param string $hook The current admin page hook.
      */
     public function enqueue_admin_scripts( $hook ) {
-        if ( 'settings_page_bloglogistics_maintenance_page_slug' !== $hook ) {
+        if ( $this->settings_page_hook !== $hook ) {
             return;
         }
 
@@ -247,7 +312,7 @@ class BlogLogistics_Maintenance_Mode {
             'bloglogistics-maintenance-admin-script',
             plugins_url( 'admin-script.js', __FILE__ ), // Path to our custom admin JS (now in root)
             array( 'jquery' ),
-            '1.0.0', // Version
+            BLOGLOGISTICS_MP_VERSION, // Version
             true
         );
     }
@@ -283,7 +348,7 @@ class BlogLogistics_Maintenance_Mode {
                 <p>
                     <strong><?php esc_html_e( 'Maintenance Mode is ACTIVE!', 'bloglogistics-maintenance-page' ); ?></strong><br />
                     <?php esc_html_e( 'Your website is currently displaying the maintenance page to all non-administrators. ', 'bloglogistics-maintenance-page' ); ?>
-                    <a href="<?php echo esc_url( admin_url( 'options-general.php?page=bloglogistics_maintenance_page_slug' ) ); ?>">
+                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=bloglogistics_maintenance_page_slug' ) ); ?>">
                         <?php esc_html_e( 'Go to settings to disable it.', 'bloglogistics-maintenance-page' ); ?>
                     </a>
                 </p>

@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.9
+Stable tag: 1.5.10
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,7 +33,7 @@ The plugin includes a simple maintenance mode setting, support for a custom main
 
 1. Upload the plugin folder to /wp-content/plugins/.
 2. Activate the plugin in WordPress.
-3. Go to Settings > Maintenance Mode.
+3. Go to BlogLogistics > Maintenance Page.
 4. Enable maintenance mode when needed.
 5. Optionally select a custom maintenance image.
 
@@ -74,6 +74,10 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
+
+= 1.5.10 =
+* Move settings from Settings > Maintenance Mode to BlogLogistics > Maintenance Page.
+* Add the shared BlogLogistics wp-admin parent menu with the RSS-style icon.
 
 = 1.5.9 =
 * Automate update manifest generation and upload from GitHub Actions.
