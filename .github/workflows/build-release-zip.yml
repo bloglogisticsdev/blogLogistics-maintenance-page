@@ -25,11 +25,7 @@ jobs:
           rm -rf "${BUILD_DIR}"
           mkdir -p "${BUILD_DIR}"
 
-          rsync -av \
-            --exclude=".git" \
-            --exclude=".github" \
-            --exclude="${PLUGIN_SLUG}.zip" \
-            ./ "${BUILD_DIR}/"
+          rsync -av             --exclude=".git"             --exclude=".github"             --exclude="${PLUGIN_SLUG}.zip"             ./ "${BUILD_DIR}/"
 
       - name: Create ZIP
         run: |
@@ -124,6 +120,11 @@ jobs:
               "tested": "7.0",
               "requires_php": "8.3",
               "last_updated": last_updated,
+              "icons": {
+                  "1x": "https://updates.bloglogistics.com/plugins/assets/icon-128x128.png",
+                  "2x": "https://updates.bloglogistics.com/plugins/assets/icon-256x256.png",
+                  "default": "https://updates.bloglogistics.com/plugins/assets/icon-128x128.png",
+              },
               "sections": {
                   "description": "Displays a custom maintenance page for visitors while allowing administrators to access the site.",
                   "changelog": changelog_html,
@@ -132,7 +133,8 @@ jobs:
 
           output_path = Path(f"{manifest_slug}.json")
           output_path.write_text(
-              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "
+",
               encoding="utf-8",
           )
 
