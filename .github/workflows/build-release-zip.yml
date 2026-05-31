@@ -125,6 +125,11 @@ jobs:
                   "2x": "https://updates.bloglogistics.com/plugins/assets/icon-256x256.png",
                   "default": "https://updates.bloglogistics.com/plugins/assets/icon-128x128.png",
               },
+              "banners": {
+                  "low": "https://updates.bloglogistics.com/plugins/assets/banner-772x250.png",
+                  "high": "https://updates.bloglogistics.com/plugins/assets/banner-1544x500.png",
+                  "default": "https://updates.bloglogistics.com/plugins/assets/banner-772x250.png",
+              },
               "sections": {
                   "description": "Displays a custom maintenance page for visitors while allowing administrators to access the site.",
                   "changelog": changelog_html,
