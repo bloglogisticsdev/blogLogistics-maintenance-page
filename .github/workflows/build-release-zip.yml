@@ -111,11 +111,38 @@ jobs:
 
           changelog_html = "".join(html_parts) if html_parts else "<p>No changelog available.</p>"
 
+          installation_html = (
+              "<ol>"
+              "<li>Upload the plugin folder to <code>/wp-content/plugins/</code>.</li>"
+              "<li>Activate BlogLogistics Maintenance Page in WordPress.</li>"
+              "<li>Go to <strong>BlogLogistics &gt; Maintenance Page</strong>.</li>"
+              "<li>Enable maintenance mode when you need visitors to see the maintenance page.</li>"
+              "<li>Optionally choose a custom maintenance image from the WordPress Media Library.</li>"
+              "</ol>"
+          )
+
+          faq_html = (
+              "<h4>Will administrators still see the normal site?</h4>"
+              "<p>Yes. Logged-in administrators can continue viewing and editing the site normally.</p>"
+              "<h4>Will visitors see the maintenance page?</h4>"
+              "<p>Yes. When maintenance mode is enabled, visitors and non-administrator users will see the maintenance page.</p>"
+              "<h4>Can I use a custom maintenance image?</h4>"
+              "<p>Yes. You can choose a custom maintenance image from the WordPress Media Library.</p>"
+              "<h4>What happens if I do not choose a custom image?</h4>"
+              "<p>The plugin uses its bundled default maintenance image.</p>"
+              "<h4>Does the plugin send a 503 status code?</h4>"
+              "<p>Yes. When maintenance mode is active, the plugin sends a 503 Service Unavailable response.</p>"
+              "<h4>Is this compatible with caching plugins?</h4>"
+              "<p>The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chance of caching systems storing the maintenance page.</p>"
+          )
+
           manifest = {
               "name": plugin_name,
               "version": version,
               "download_url": download_url,
               "homepage": repo_url,
+              "author": "<a href=\"https://www.bloglogistics.com\" target=\"_blank\" rel=\"noopener noreferrer\">BlogLogistics</a>",
+              "author_profile": "https://www.bloglogistics.com",
               "requires": "7.0",
               "tested": "7.0",
               "requires_php": "8.3",
@@ -132,6 +159,8 @@ jobs:
               },
               "sections": {
                   "description": "Displays a custom maintenance page for visitors while allowing administrators to access the site.",
+                  "installation": installation_html,
+                  "faq": faq_html,
                   "changelog": changelog_html,
               },
           }
