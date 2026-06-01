@@ -1,0 +1,65 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BlogLogistics Maintenance Page 1.6.0\n"
+"Report-Msgid-Bugs-To: https://www.bloglogistics.com/\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"Last-Translator: BlogLogistics\n"
+"Language-Team: BlogLogistics\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: bloglogistics-maintenance-page\n"
+
+msgid "Maintenance Mode Settings"
+msgstr "Ajustes del modo de mantenimiento"
+
+msgid "Enable Maintenance Mode"
+msgstr "Activar el modo de mantenimiento"
+
+msgid "Custom Maintenance Image"
+msgstr "Imagen de mantenimiento personalizada"
+
+msgid "Check this box to put your website into maintenance mode."
+msgstr "Marca esta casilla para poner tu sitio web en modo de mantenimiento."
+
+msgid "Upload/Select Image"
+msgstr "Subir/seleccionar imagen"
+
+msgid "Remove Image"
+msgstr "Quitar imagen"
+
+msgid "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+msgstr "Sube una imagen personalizada para tu página de mantenimiento. Si no se define ninguna imagen, se usará la imagen predeterminada."
+
+msgid "Maintenance Page"
+msgstr "Página de mantenimiento"
+
+msgid "BlogLogistics"
+msgstr "BlogLogistics"
+
+msgid "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+msgstr "Usa los elementos del submenú de BlogLogistics para gestionar los plugins BlogLogistics instalados."
+
+msgid "BlogLogistics Maintenance Mode"
+msgstr "Modo de mantenimiento de BlogLogistics"
+
+msgid "Maintenance Mode is ACTIVE!"
+msgstr "¡El modo de mantenimiento está ACTIVO!"
+
+msgid "Your website is currently displaying the maintenance page to all non-administrators. "
+msgstr "Tu sitio web está mostrando actualmente la página de mantenimiento a todos los usuarios que no son administradores. "
+
+msgid "Go to settings to disable it."
+msgstr "Ve a los ajustes para desactivarlo."
+
+msgid "Website Under Maintenance"
+msgstr "Sitio web en mantenimiento"
+
+msgid "WEBSITE UNDER MAINTENANCE"
+msgstr "SITIO WEB EN MANTENIMIENTO"
+
+msgid "This website is under maintenance, we'll be back soon"
+msgstr "Este sitio web está en mantenimiento, volveremos pronto"

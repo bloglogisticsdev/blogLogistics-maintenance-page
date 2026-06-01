@@ -1,0 +1,65 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BlogLogistics Maintenance Page 1.6.0\n"
+"Report-Msgid-Bugs-To: https://www.bloglogistics.com/\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"Last-Translator: BlogLogistics\n"
+"Language-Team: BlogLogistics\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: bloglogistics-maintenance-page\n"
+
+msgid "Maintenance Mode Settings"
+msgstr "Innstillinger for vedlikeholdsmodus"
+
+msgid "Enable Maintenance Mode"
+msgstr "Aktiver vedlikeholdsmodus"
+
+msgid "Custom Maintenance Image"
+msgstr "Egendefinert vedlikeholdsbilde"
+
+msgid "Check this box to put your website into maintenance mode."
+msgstr "Merk av i denne boksen for å sette nettstedet i vedlikeholdsmodus."
+
+msgid "Upload/Select Image"
+msgstr "Last opp/velg bilde"
+
+msgid "Remove Image"
+msgstr "Fjern bilde"
+
+msgid "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+msgstr "Last opp et egendefinert bilde for vedlikeholdssiden. Hvis ikke noe bilde er valgt, brukes standardbildet."
+
+msgid "Maintenance Page"
+msgstr "Vedlikeholdsside"
+
+msgid "BlogLogistics"
+msgstr "BlogLogistics"
+
+msgid "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+msgstr "Bruk undermenyene i BlogLogistics for å administrere installerte BlogLogistics-utvidelser."
+
+msgid "BlogLogistics Maintenance Mode"
+msgstr "BlogLogistics vedlikeholdsmodus"
+
+msgid "Maintenance Mode is ACTIVE!"
+msgstr "Vedlikeholdsmodus er AKTIV!"
+
+msgid "Your website is currently displaying the maintenance page to all non-administrators. "
+msgstr "Nettstedet viser nå vedlikeholdssiden til alle som ikke er administratorer. "
+
+msgid "Go to settings to disable it."
+msgstr "Gå til innstillingene for å deaktivere den."
+
+msgid "Website Under Maintenance"
+msgstr "Nettsted under vedlikehold"
+
+msgid "WEBSITE UNDER MAINTENANCE"
+msgstr "NETTSTED UNDER VEDLIKEHOLD"
+
+msgid "This website is under maintenance, we'll be back soon"
+msgstr "Dette nettstedet er under vedlikehold, vi er snart tilbake"

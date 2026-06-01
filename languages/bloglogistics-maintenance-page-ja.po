@@ -1,0 +1,65 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BlogLogistics Maintenance Page 1.6.0\n"
+"Report-Msgid-Bugs-To: https://www.bloglogistics.com/\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"Last-Translator: BlogLogistics\n"
+"Language-Team: BlogLogistics\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: bloglogistics-maintenance-page\n"
+
+msgid "Maintenance Mode Settings"
+msgstr "メンテナンスモード設定"
+
+msgid "Enable Maintenance Mode"
+msgstr "メンテナンスモードを有効化"
+
+msgid "Custom Maintenance Image"
+msgstr "カスタムメンテナンス画像"
+
+msgid "Check this box to put your website into maintenance mode."
+msgstr "ウェブサイトをメンテナンスモードにするには、このボックスにチェックを入れてください。"
+
+msgid "Upload/Select Image"
+msgstr "画像をアップロード/選択"
+
+msgid "Remove Image"
+msgstr "画像を削除"
+
+msgid "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+msgstr "メンテナンスページ用のカスタム画像をアップロードします。画像が設定されていない場合は、既定の画像が使用されます。"
+
+msgid "Maintenance Page"
+msgstr "メンテナンスページ"
+
+msgid "BlogLogistics"
+msgstr "BlogLogistics"
+
+msgid "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+msgstr "インストール済みの BlogLogistics プラグインを管理するには、BlogLogistics のサブメニュー項目を使用してください。"
+
+msgid "BlogLogistics Maintenance Mode"
+msgstr "BlogLogistics メンテナンスモード"
+
+msgid "Maintenance Mode is ACTIVE!"
+msgstr "メンテナンスモードが有効です！"
+
+msgid "Your website is currently displaying the maintenance page to all non-administrators. "
+msgstr "現在、管理者以外のすべてのユーザーにメンテナンスページが表示されています。"
+
+msgid "Go to settings to disable it."
+msgstr "無効にするには設定に移動してください。"
+
+msgid "Website Under Maintenance"
+msgstr "ウェブサイトはメンテナンス中です"
+
+msgid "WEBSITE UNDER MAINTENANCE"
+msgstr "ウェブサイトはメンテナンス中です"
+
+msgid "This website is under maintenance, we'll be back soon"
+msgstr "このウェブサイトはメンテナンス中です。まもなく再開します"

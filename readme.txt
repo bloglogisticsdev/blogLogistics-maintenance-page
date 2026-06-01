@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.5.14
+Stable tag: 1.6.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,16 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
+
+= 1.6.0 =
+* Refactor the main plugin file into a bootstrap loader.
+* Move the main plugin class into the includes directory.
+* Add translation support and bundled language files.
+* Add language files for English Australia, English Great Britain, French, German, Spanish, Norwegian Bokmål, Swedish, and Japanese.
+* Add Domain Path metadata for bundled language files.
+* Move the bundled default maintenance image into the assets directory and keep the default front-end image working.
+* Add uninstall cleanup for this plugin’s saved settings.
+* Preserve update metadata, including icons, banners, Installation, FAQ, Author, and changelog support.
 
 = 1.5.14 =
 * Add Installation and FAQ tabs to the plugin details modal.

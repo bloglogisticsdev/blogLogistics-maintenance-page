@@ -1,0 +1,61 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BlogLogistics Maintenance Page 1.6.0\n"
+"Report-Msgid-Bugs-To: https://www.bloglogistics.com/\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: bloglogistics-maintenance-page\n"
+
+msgid "Maintenance Mode Settings"
+msgstr ""
+
+msgid "Enable Maintenance Mode"
+msgstr ""
+
+msgid "Custom Maintenance Image"
+msgstr ""
+
+msgid "Check this box to put your website into maintenance mode."
+msgstr ""
+
+msgid "Upload/Select Image"
+msgstr ""
+
+msgid "Remove Image"
+msgstr ""
+
+msgid "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+msgstr ""
+
+msgid "Maintenance Page"
+msgstr ""
+
+msgid "BlogLogistics"
+msgstr ""
+
+msgid "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+msgstr ""
+
+msgid "BlogLogistics Maintenance Mode"
+msgstr ""
+
+msgid "Maintenance Mode is ACTIVE!"
+msgstr ""
+
+msgid "Your website is currently displaying the maintenance page to all non-administrators. "
+msgstr ""
+
+msgid "Go to settings to disable it."
+msgstr ""
+
+msgid "Website Under Maintenance"
+msgstr ""
+
+msgid "WEBSITE UNDER MAINTENANCE"
+msgstr ""
+
+msgid "This website is under maintenance, we'll be back soon"
+msgstr ""

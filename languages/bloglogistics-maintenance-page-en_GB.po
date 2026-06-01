@@ -1,0 +1,65 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BlogLogistics Maintenance Page 1.6.0\n"
+"Report-Msgid-Bugs-To: https://www.bloglogistics.com/\n"
+"POT-Creation-Date: 2026-06-01 00:00+0000\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"Last-Translator: BlogLogistics\n"
+"Language-Team: BlogLogistics\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: ChatGPT\n"
+"X-Domain: bloglogistics-maintenance-page\n"
+
+msgid "Maintenance Mode Settings"
+msgstr "Maintenance Mode Settings"
+
+msgid "Enable Maintenance Mode"
+msgstr "Enable Maintenance Mode"
+
+msgid "Custom Maintenance Image"
+msgstr "Custom Maintenance Image"
+
+msgid "Check this box to put your website into maintenance mode."
+msgstr "Check this box to put your website into maintenance mode."
+
+msgid "Upload/Select Image"
+msgstr "Upload/Select Image"
+
+msgid "Remove Image"
+msgstr "Remove Image"
+
+msgid "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+msgstr "Upload a custom image for your maintenance page. If no image is set, the default image will be used."
+
+msgid "Maintenance Page"
+msgstr "Maintenance Page"
+
+msgid "BlogLogistics"
+msgstr "BlogLogistics"
+
+msgid "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+msgstr "Use the BlogLogistics submenu items to manage installed BlogLogistics plugins."
+
+msgid "BlogLogistics Maintenance Mode"
+msgstr "BlogLogistics Maintenance Mode"
+
+msgid "Maintenance Mode is ACTIVE!"
+msgstr "Maintenance Mode is ACTIVE!"
+
+msgid "Your website is currently displaying the maintenance page to all non-administrators. "
+msgstr "Your website is currently displaying the maintenance page to all non-administrators. "
+
+msgid "Go to settings to disable it."
+msgstr "Go to settings to disable it."
+
+msgid "Website Under Maintenance"
+msgstr "Website Under Maintenance"
+
+msgid "WEBSITE UNDER MAINTENANCE"
+msgstr "WEBSITE UNDER MAINTENANCE"
+
+msgid "This website is under maintenance, we'll be back soon"
+msgstr "This website is under maintenance, we'll be back soon"
