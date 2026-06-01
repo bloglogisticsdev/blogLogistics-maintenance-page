@@ -4,7 +4,7 @@ Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
 Tested up to: 7.0
 Requires PHP: 8.3
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,9 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
 
 == Changelog ==
+
+= 1.6.1 =
+* Fix duplicate active maintenance mode admin notice by ensuring the plugin class is instantiated only once.
 
 = 1.6.0 =
 * Refactor the main plugin file into a bootstrap loader.

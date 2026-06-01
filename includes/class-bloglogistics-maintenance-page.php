@@ -510,6 +510,3 @@ class BlogLogistics_Maintenance_Mode {
         exit(); // Crucial to stop WordPress execution and display only this page.
     }
 }
-
-// Instantiate the plugin class.
-new BlogLogistics_Maintenance_Mode();
