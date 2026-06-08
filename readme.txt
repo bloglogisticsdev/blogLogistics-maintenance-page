@@ -29,6 +29,14 @@ The plugin includes a simple maintenance mode setting, support for a custom main
 * Uses a bundled default maintenance image when no custom image is selected.
 * Lightweight implementation with no front-end configuration required.
 
+== BlogLogistics Service Usage Notice ==
+
+This plugin is licensed under GPL-3.0-or-later.
+
+This plugin is provided by BlogLogistics as part of an active hosting, maintenance, or site-management service, unless a separate service arrangement has been granted. If the website is moved to another provider, continued BlogLogistics service use, support, updates, configuration assistance, or replacement work may require a separate agreement.
+
+This notice does not restrict any rights granted under the GPL-3.0-or-later licence.
+
 == Installation ==
 
 1. Upload the plugin folder to /wp-content/plugins/.
@@ -72,6 +80,10 @@ The plugin sends no-cache headers and defines DONOTCACHEPAGE to reduce the chanc
 = Does this plugin require coding? =
 
 No. Maintenance mode can be enabled or disabled from the WordPress admin.
+
+= Does this plugin continue to be covered by BlogLogistics service terms if the website moves to another provider? =
+
+This plugin is licensed under GPL-3.0-or-later. BlogLogistics service use, support, updates, configuration assistance, or replacement work may require an active BlogLogistics hosting, maintenance, or site-management service, or a separate agreement. This notice does not restrict any rights granted under the GPL-3.0-or-later licence.
 
 == Changelog ==
 
