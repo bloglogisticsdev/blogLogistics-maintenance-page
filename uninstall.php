@@ -12,6 +12,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 $options = array(
     'bloglogistics_maintenance_mode_enabled',
     'bloglogistics_maintenance_custom_image_url',
+    'bloglogistics_maintenance_message',
     'bloglogistics_maintenance_cache_buster',
 );
 

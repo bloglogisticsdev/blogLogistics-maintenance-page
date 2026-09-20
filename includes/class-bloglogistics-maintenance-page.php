@@ -28,6 +28,11 @@ class BlogLogistics_Maintenance_Mode {
     const OPTION_CUSTOM_IMAGE_URL = 'bloglogistics_maintenance_custom_image_url';
 
     /**
+     * Option key for the optional maintenance message.
+     */
+    const OPTION_MAINTENANCE_MESSAGE = 'bloglogistics_maintenance_message';
+
+    /**
      * Default maintenance image path, relative to the plugin directory.
      */
     const DEFAULT_IMAGE_RELATIVE_PATH = 'assets/website-maintenance-min.jpg';
@@ -59,6 +64,12 @@ class BlogLogistics_Maintenance_Mode {
         // Purge caches immediately whenever maintenance mode is toggled.
         add_action( 'update_option_' . self::OPTION_ENABLE_MAINTENANCE, array( $this, 'maintenance_mode_option_updated' ), 10, 3 );
         add_action( 'add_option_' . self::OPTION_ENABLE_MAINTENANCE, array( $this, 'maintenance_mode_option_added' ), 10, 2 );
+
+        // Purge caches when maintenance page content changes while maintenance mode is active.
+        add_action( 'update_option_' . self::OPTION_CUSTOM_IMAGE_URL, array( $this, 'maintenance_content_option_updated' ), 10, 3 );
+        add_action( 'add_option_' . self::OPTION_CUSTOM_IMAGE_URL, array( $this, 'maintenance_content_option_added' ), 10, 2 );
+        add_action( 'update_option_' . self::OPTION_MAINTENANCE_MESSAGE, array( $this, 'maintenance_content_option_updated' ), 10, 3 );
+        add_action( 'add_option_' . self::OPTION_MAINTENANCE_MESSAGE, array( $this, 'maintenance_content_option_added' ), 10, 2 );
     }
 
     /**
@@ -100,6 +111,18 @@ class BlogLogistics_Maintenance_Mode {
             )
         );
 
+        // Register the optional maintenance message setting
+        register_setting(
+            'bloglogistics_maintenance_options', // Option group
+            self::OPTION_MAINTENANCE_MESSAGE,    // Option name
+            array(
+                'type'              => 'string',
+                'sanitize_callback' => array( $this, 'sanitize_maintenance_message' ),
+                'default'           => '',
+                'show_in_rest'      => false,
+            )
+        );
+
         // Add a settings section
         add_settings_section(
             'bloglogistics_maintenance_section', // ID
@@ -113,6 +136,15 @@ class BlogLogistics_Maintenance_Mode {
             'bloglogistics_maintenance_enable_field', // ID
             esc_html__( 'Enable Maintenance Mode', 'bloglogistics-maintenance-page' ), // Title
             array( $this, 'render_enable_maintenance_field' ), // Callback
+            'bloglogistics_maintenance_page_slug', // Page
+            'bloglogistics_maintenance_section' // Section
+        );
+
+        // Add the optional maintenance message field
+        add_settings_field(
+            'bloglogistics_maintenance_message_field', // ID
+            esc_html__( 'Maintenance Message', 'bloglogistics-maintenance-page' ), // Title
+            array( $this, 'render_maintenance_message_field' ), // Callback
             'bloglogistics_maintenance_page_slug', // Page
             'bloglogistics_maintenance_section' // Section
         );
@@ -135,6 +167,16 @@ class BlogLogistics_Maintenance_Mode {
      */
     public function sanitize_image_url( $url ) {
         return esc_url_raw( $url );
+    }
+
+    /**
+     * Sanitizes the optional maintenance message.
+     *
+     * @param string $message The submitted maintenance message.
+     * @return string The sanitized maintenance message.
+     */
+    public function sanitize_maintenance_message( $message ) {
+        return sanitize_textarea_field( $message );
     }
 
     /**
@@ -162,6 +204,19 @@ class BlogLogistics_Maintenance_Mode {
             <input type="checkbox" id="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" name="<?php echo esc_attr( self::OPTION_ENABLE_MAINTENANCE ); ?>" value="1" <?php checked( $enabled, true ); ?> />
             <?php esc_html_e( 'Check this box to put your website into maintenance mode.', 'bloglogistics-maintenance-page' ); ?>
         </label>
+        <?php
+    }
+
+    /**
+     * Renders the optional maintenance message field.
+     */
+    public function render_maintenance_message_field() {
+        $message = get_option( self::OPTION_MAINTENANCE_MESSAGE, '' );
+        ?>
+        <textarea id="<?php echo esc_attr( self::OPTION_MAINTENANCE_MESSAGE ); ?>" name="<?php echo esc_attr( self::OPTION_MAINTENANCE_MESSAGE ); ?>" rows="4" class="large-text"><?php echo esc_textarea( $message ); ?></textarea>
+        <p class="description">
+            <?php esc_html_e( 'Optional text displayed below the “Website Under Maintenance” heading. Leave blank to show no additional message.', 'bloglogistics-maintenance-page' ); ?>
+        </p>
         <?php
     }
 
@@ -417,6 +472,36 @@ class BlogLogistics_Maintenance_Mode {
     }
 
     /**
+     * Purges caches when a maintenance page content option is first created.
+     *
+     * @param string $option The option name.
+     * @param mixed  $value  The option value.
+     */
+    public function maintenance_content_option_added( $option, $value ) {
+        $this->maintenance_content_option_updated( null, $value, $option );
+    }
+
+    /**
+     * Purges caches when maintenance page content changes while maintenance mode is active.
+     *
+     * @param mixed  $old_value The old option value.
+     * @param mixed  $value     The new option value.
+     * @param string $option    The option name.
+     */
+    public function maintenance_content_option_updated( $old_value, $value, $option ) {
+        if ( ! in_array( $option, array( self::OPTION_CUSTOM_IMAGE_URL, self::OPTION_MAINTENANCE_MESSAGE ), true ) ) {
+            return;
+        }
+
+        if ( ! $this->is_maintenance_mode_active() ) {
+            return;
+        }
+
+        update_option( 'bloglogistics_maintenance_cache_buster', time(), false );
+        $this->purge_all_known_caches();
+    }
+
+    /**
      * Runs after maintenance mode is toggled.
      *
      * @param mixed $old_value The old option value.
@@ -502,11 +587,20 @@ class BlogLogistics_Maintenance_Mode {
         status_header( 503 );
 
         // Use a custom image when set, otherwise use the bundled default image from /assets/.
-        $custom_image_url = get_option( self::OPTION_CUSTOM_IMAGE_URL );
-        $image_url        = ! empty( $custom_image_url ) ? $custom_image_url : BLOGLOGISTICS_MP_URL . self::DEFAULT_IMAGE_RELATIVE_PATH;
+        $custom_image_url    = get_option( self::OPTION_CUSTOM_IMAGE_URL );
+        $maintenance_message = get_option( self::OPTION_MAINTENANCE_MESSAGE, '' );
+        $image_url           = ! empty( $custom_image_url ) ? $custom_image_url : BLOGLOGISTICS_MP_URL . self::DEFAULT_IMAGE_RELATIVE_PATH;
+        $message_html        = '';
+
+        $body_class = '';
+
+        if ( '' !== trim( $maintenance_message ) ) {
+            $message_html = '<p class="maintenance-message">' . nl2br( esc_html( $maintenance_message ) ) . '</p>';
+            $body_class   = ' class="has-maintenance-message"';
+        }
 
         // Output the maintenance page using the old working method (single echo, no output buffering)
-        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" text="text/html; charset=utf-8" /><meta http-equiv="CACHE-CONTROL" content="NO-CACHE" /><meta http-equiv="PRAGMA" content="NO-CACHE" /><meta http-equiv="EXPIRES" content="0" /><title>' . esc_html__( 'Website Under Maintenance', 'bloglogistics-maintenance-page' ) . '</title><style> html,body{height:100%;margin:0;padding:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-sizing:border-box}h1{margin:0;padding:20px;font-size:2em}img{max-width:90%;max-height:90%;width:auto;height:auto;box-shadow:0 10px 10px -5px rgba(0,0,0,0.5);border:10px solid white;outline:1px solid rgba(0,0,0,0.1)}@media (max-width:600px){img{max-width:80%}}</style></head><body><h1>' . esc_html__( 'WEBSITE UNDER MAINTENANCE', 'bloglogistics-maintenance-page' ) . '</h1><img class="skip-lazy" src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '" title="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '"/></body></html>';
+        echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><meta http-equiv="CACHE-CONTROL" content="NO-CACHE" /><meta http-equiv="PRAGMA" content="NO-CACHE" /><meta http-equiv="EXPIRES" content="0" /><title>' . esc_html__( 'Website Under Maintenance', 'bloglogistics-maintenance-page' ) . '</title><style>html,body{height:100%;margin:0;padding:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;box-sizing:border-box}h1{margin:0;padding:20px;font-size:2em}.maintenance-message{max-width:720px;margin:-5px 20px 20px;font-size:1.1em;line-height:1.5}.has-maintenance-message img{max-height:70vh}img{max-width:90%;max-height:90%;width:auto;height:auto;box-shadow:0 10px 10px -5px rgba(0,0,0,0.5);border:10px solid white;outline:1px solid rgba(0,0,0,0.1)}@media (max-width:600px){img{max-width:80%}}</style></head><body' . $body_class . '><h1>' . esc_html__( 'WEBSITE UNDER MAINTENANCE', 'bloglogistics-maintenance-page' ) . '</h1>' . $message_html . '<img class="skip-lazy" src="' . esc_url( $image_url ) . '" alt="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '" title="' . esc_attr__( 'This website is under maintenance, we\'ll be back soon', 'bloglogistics-maintenance-page' ) . '"/></body></html>';
         exit(); // Crucial to stop WordPress execution and display only this page.
     }
 }

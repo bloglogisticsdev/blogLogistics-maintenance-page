@@ -2,9 +2,9 @@
 Contributors: bloglogistics
 Tags: maintenance, maintenance mode, 503, coming soon, admin
 Requires at least: 7.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -14,11 +14,12 @@ Displays a custom maintenance page for visitors while allowing administrators to
 
 BlogLogistics Maintenance Page displays a maintenance page on the front end of a WordPress site while allowing logged-in administrators to continue accessing and editing the regular site.
 
-The plugin includes a simple maintenance mode setting, support for a custom maintenance image, administrator bypass, and cache-aware headers so visitors and search engines understand that the site is temporarily unavailable.
+The plugin includes a simple maintenance mode setting, an optional custom maintenance message, support for a custom maintenance image, administrator bypass, and cache-aware headers so visitors and search engines understand that the site is temporarily unavailable.
 
 == Features ==
 
 * Simple maintenance mode toggle from the WordPress admin.
+* Optional custom maintenance message displayed below the maintenance heading.
 * Custom maintenance image support using the WordPress Media Library.
 * Logged-in administrators can continue using the normal site.
 * Visitors and non-administrator users see the maintenance page when maintenance mode is enabled.
@@ -43,7 +44,7 @@ This notice does not restrict any rights granted under the GPL-3.0-or-later lice
 2. Activate the plugin in WordPress.
 3. Go to BlogLogistics > Maintenance Page.
 4. Enable maintenance mode when needed.
-5. Optionally select a custom maintenance image.
+5. Optionally add a maintenance message and select a custom maintenance image.
 
 == Usage ==
 
@@ -60,6 +61,10 @@ Yes. Logged-in administrators can continue viewing and editing the site normally
 = Will visitors see the maintenance page? =
 
 Yes. When maintenance mode is enabled, visitors and non-administrator users will see the maintenance page.
+
+= Can I add a custom maintenance message? =
+
+Yes. You can add optional text that appears below the “Website Under Maintenance” heading. Leave the field blank to display no additional message.
 
 = Can I use a custom maintenance image? =
 
@@ -86,6 +91,13 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 This plugin is licensed under GPL-3.0-or-later. BlogLogistics service use, support, updates, configuration assistance, or replacement work may require an active BlogLogistics hosting, maintenance, or site-management service, or a separate agreement. This notice does not restrict any rights granted under the GPL-3.0-or-later licence.
 
 == Changelog ==
+
+= 1.6.4 =
+* Add an optional custom maintenance message displayed below the maintenance heading.
+* Sanitise and safely escape the custom maintenance message.
+* Remove the custom maintenance message setting during plugin uninstall.
+* Purge known caches when the maintenance message or image changes while maintenance mode is active.
+* Confirm compatibility through WordPress 7.1.
 
 = 1.6.3 =
 * Generate the update manifest Installation section from readme.txt.
@@ -171,6 +183,9 @@ This plugin is licensed under GPL-3.0-or-later. BlogLogistics service use, suppo
 * Fixed issue where caching solutions could still display the normal content page.
 
 == Upgrade Notice ==
+
+= 1.6.4 =
+Adds an optional maintenance message and confirms compatibility through WordPress 7.1.
 
 = 1.5.8 =
 Maintenance Page now checks BlogLogistics update manifests instead of the GitHub API for update metadata.
