@@ -433,13 +433,29 @@ class BlogLogistics_Maintenance_Mode {
             return true;
         }
 
-        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-
-        if ( false !== strpos( $request_uri, 'wp-login.php' ) ) {
+        if ( ( $GLOBALS['pagenow'] ?? '' ) === 'wp-login.php' ) {
             return true;
         }
 
-        return false;
+        return doing_action( 'init' ) && $this->is_management_request();
+    }
+
+    /**
+     * Let the installed management connector handle its own signed command
+     * and one-time sign-in routes before WordPress sets REST_REQUEST.
+     */
+    private function is_management_request() {
+        if ( ! function_exists( 'BlogLogistics\SiteTools\Asgard\permission' ) &&
+             ! function_exists( 'BlogLogistics\Child\permission' ) ) {
+            return false;
+        }
+
+        $method = $_SERVER['REQUEST_METHOD'] ?? '';
+        if ( 'POST' === $method ) {
+            return ( $_GET['rest_route'] ?? null ) === '/bloglogistics/v1/command' ||
+                isset( $_POST['blm_login'] );
+        }
+        return 'GET' === $method && isset( $_GET['blm_admin_bridge'] );
     }
 
     /**

@@ -1,10 +1,10 @@
 === BlogLogistics Maintenance Page ===
 Contributors: bloglogistics
 Tags: maintenance, maintenance mode, 503, coming soon, admin
-Requires at least: 7.0
+Requires at least: 7.1
 Tested up to: 7.1
 Requires PHP: 8.3
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -91,6 +91,9 @@ No. Maintenance mode can be enabled or disabled from the WordPress admin.
 This plugin is licensed under GPL-3.0-or-later. BlogLogistics service use, support, updates, configuration assistance, or replacement work may require an active BlogLogistics hosting, maintenance, or site-management service, or a separate agreement. This notice does not restrict any rights granted under the GPL-3.0-or-later licence.
 
 == Changelog ==
+
+= 1.6.5 =
+* Allow authorised site management and one-click WP Admin during maintenance mode.
 
 = 1.6.4 =
 * Add an optional custom maintenance message displayed below the maintenance heading.

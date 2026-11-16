@@ -206,8 +206,8 @@ jobs:
               "homepage": repo_url,
               "author": "<a href=\"https://www.bloglogistics.com\" target=\"_blank\" rel=\"noopener noreferrer\">BlogLogistics</a>",
               "author_profile": "https://www.bloglogistics.com",
-              "requires": "7.0",
-              "tested": "7.0",
+              "requires": "7.1",
+              "tested": "7.1",
               "requires_php": "8.3",
               "last_updated": last_updated,
               "icons": {
